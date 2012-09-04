@@ -1,0 +1,16 @@
+This directory contains the source code for the MS Windows program
+PdStripGui. It has to be compiled and linked with the Salford FTN95
+compiler. Although these files are licensed under the MIT license, the
+resulting program is non-free as it links with the salflibc.dll of Silverfrost.
+
+You can download the compiler free of charge for personal use from
+www.silverfrost.com and compile this program, but because of the proprietary
+DLL we cannot distribute a complete binary installation of PdStripGui on
+SourceForge.
+
+
+HOW TO RUN PdStripGui
+
+1) copy pdstrip.EXE from the parent directory into this directory.
+2) run PdStripGui.EXE.
+
