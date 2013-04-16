@@ -1,0 +1,88 @@
+#!/bin/gnuplot
+set terminal postscript solid colour "helvetica" 8
+set output "RAO.ps"
+
+set key off
+set grid
+set xlabel "Wavelength"
+set ylabel "RAO"
+
+set multiplot layout 3,2 title "RAO Results - 1 degree - 0 speed"
+set title "Surge"
+plot "raoTable.out" using 1:($3==1?(($2==0)?$4:1/0):1/0) with linespoints
+set title "Sway"
+plot "raoTable.out" using 1:($3==1?(($2==0)?$9:1/0):1/0) with linespoints
+set title "Yaw"
+plot "raoTable.out" using 1:($3==1?(($2==0)?$5:1/0):1/0) with linespoints
+
+set title "Heave"
+plot "raoTable.out" using 1:($3==1?(($2==0)?$6:1/0):1/0) with linespoints
+set title "Pitch"
+plot "raoTable.out" using 1:($3==1?(($2==0)?$8:1/0):1/0) with linespoints
+set title "Roll"
+plot "raoTable.out" using 1:($3==1?(($2==0)?$7:1/0):1/0) with linespoints
+unset multiplot
+
+set multiplot layout 3,2 title "RAO Results - 45 degree - 0 speed"
+set title "Surge"
+plot "raoTable.out" using 1:($3==45?(($2==0)?$4:1/0):1/0) with linespoints
+set title "Sway"
+plot "raoTable.out" using 1:($3==45?(($2==0)?$9:1/0):1/0) with linespoints
+set title "Yaw"
+plot "raoTable.out" using 1:($3==45?(($2==0)?$5:1/0):1/0) with linespoints
+
+set title "Heave"
+plot "raoTable.out" using 1:($3==45?(($2==0)?$6:1/0):1/0) with linespoints
+set title "Pitch"
+plot "raoTable.out" using 1:($3==45?(($2==0)?$8:1/0):1/0) with linespoints
+set title "Roll"
+plot "raoTable.out" using 1:($3==45?(($2==0)?$7:1/0):1/0) with linespoints
+unset multiplot
+
+set multiplot layout 3,2 title "RAO Results - 90 degree - 0 speed"
+set title "Surge"
+plot "raoTable.out" using 1:($3==90?(($2==0)?$4:1/0):1/0) with linespoints
+set title "Sway"
+plot "raoTable.out" using 1:($3==90?(($2==0)?$9:1/0):1/0) with linespoints
+set title "Yaw"
+plot "raoTable.out" using 1:($3==90?(($2==0)?$5:1/0):1/0) with linespoints
+
+set title "Heave"
+plot "raoTable.out" using 1:($3==90?(($2==0)?$6:1/0):1/0) with linespoints
+set title "Pitch"
+plot "raoTable.out" using 1:($3==90?(($2==0)?$8:1/0):1/0) with linespoints
+set title "Roll"
+plot "raoTable.out" using 1:($3==90?(($2==0)?$7:1/0):1/0) with linespoints
+unset multiplot
+
+set multiplot layout 3,2 title "RAO Results - 135 degree - 0 speed"
+set title "Surge"
+plot "raoTable.out" using 1:($3==135?(($2==0)?$4:1/0):1/0) with linespoints
+set title "Sway"
+plot "raoTable.out" using 1:($3==135?(($2==0)?$9:1/0):1/0) with linespoints
+set title "Yaw"
+plot "raoTable.out" using 1:($3==135?(($2==0)?$5:1/0):1/0) with linespoints
+
+set title "Heave"
+plot "raoTable.out" using 1:($3==135?(($2==0)?$6:1/0):1/0) with linespoints
+set title "Pitch"
+plot "raoTable.out" using 1:($3==135?(($2==0)?$8:1/0):1/0) with linespoints
+set title "Roll"
+plot "raoTable.out" using 1:($3==135?(($2==0)?$7:1/0):1/0) with linespoints
+unset multiplot
+
+set multiplot layout 3,2 title "RAO Results - 179 degree - 0 speed"
+set title "Surge"
+plot "raoTable.out" using 1:($3==179?(($2==0)?$4:1/0):1/0) with linespoints
+set title "Sway"
+plot "raoTable.out" using 1:($3==179?(($2==0)?$9:1/0):1/0) with linespoints
+set title "Yaw"
+plot "raoTable.out" using 1:($3==179?(($2==0)?$5:1/0):1/0) with linespoints
+
+set title "Heave"
+plot "raoTable.out" using 1:($3==179?(($2==0)?$6:1/0):1/0) with linespoints
+set title "Pitch"
+plot "raoTable.out" using 1:($3==179?(($2==0)?$8:1/0):1/0) with linespoints
+set title "Roll"
+plot "raoTable.out" using 1:($3==179?(($2==0)?$7:1/0):1/0) with linespoints
+unset multiplot

@@ -1226,6 +1226,7 @@ real:: xs                       !x of intersection (midway between offset sectio
 real:: fxi,feta                 !longitudinal and transverse drift force
 real:: dystb,dyprt              !change of y at waterline starbd, port between successive sections
 real:: xdotdr                   !water particle reduced drift velocity in wave direction
+real:: rao(6,nvmax,nmumax,nfremax) !RAO results for output - P.G. and T.B. Apr 2013
 real, dimension(3):: lu,lo,ru,ro !lower left, upper left, lower right, upper right point of patch
 real, dimension(3):: d1,d2      !patch diagonals
 real, dimension(3,1):: fl       !patch area vector (normal on patch)
@@ -1353,6 +1354,9 @@ END IF
 
 open(5,file=TRIM(pathName)//TRIM(fileName)//'.inp',status='old')    ! GT/2006-04-28
 open(6,file=TRIM(pathName)//TRIM(fileName)//'.out',status='replace')    ! GT/2006-04-28
+
+
+
 read(5,*) npres,lsect,ltrans,lsign
 write(6,'(a,i3)') ' No. of pressure points per section ',npres
 write(6,'(a,a )') ' Section hydrodynamic data?         ',merge('yes',' no',lsect)
@@ -2053,9 +2057,18 @@ Wavelengths: do iom=1,nom                                                       
 !             &f6.3,''  wave length'',f7.2,''  wave number'',f7.4,''  wave angle'',f6.1/ &
 !             &'' speed '',f6.2,''  wetted transom?        '',l2,''  log(determinant) '',2f7.2)') &
 !             om,ome,6.28318/waven,waven,mu(imu)*180/pi,vs,ltrwet(iv),cdetl
-        write(6,'(12x,3(''  Real part('',i1,'')  Imagin.part('',i1,'')    Abs(''i1'')''))')(i,i,i,i=1,3)
+        write(6,'(12x,3(''  Real part('',i1,'')  Imagin.part('',i1,'')    Abs('',i1,'')''))')(i,i,i,i=1,3)
         write(6,'('' Translation'',3(1x,3f13.3))') (motion(i,1),abs(motion(i,1)),i=1,3)
         write(6,'('' Rotation/k '',3(1x,3f13.3))') (motion(i,1)/waven,abs(motion(i,1)/waven),i=4,6)
+
+! Collect RAO data into single array - P.G. and T.B. Apr 2013
+        rao(1,iv,imu,iom) = abs(motion(1,1));
+        rao(2,iv,imu,iom) = abs(motion(2,1));
+        rao(3,iv,imu,iom) = abs(motion(3,1));
+        rao(4,iv,imu,iom) = abs(motion(4,1))/waven;
+        rao(5,iv,imu,iom) = abs(motion(5,1))/waven;
+        rao(6,iv,imu,iom) = abs(motion(6,1))/waven;
+
         vcompar=vs*cosm+waveheight/2*ome*abs(motion(1,1)*cosm+motion(2,1)*sinm)
         if ((ome>=0.and.vcompar>=om/waven).or.(ome<0.and.vcompar<=om/waven)) then
            write(6,*)'*** SURFRIDING. linearization inappropriate'
@@ -2069,7 +2082,6 @@ Wavelengths: do iom=1,nom                                                       
            write(6,'('' absolute:   '',3f13.3)') cymabs,abs(cymabs)
         endif
         if (nb.gt.0) write(6,'(/'' Absolute motions in x, y, z direction'')')
-
         MotionPts:  do ib=1,nb
            xib(:,:,ib)=wbmatr(:,:,ib).mprod.motion
            write(6,'('' at point'',i3,3(1x,3f13.3))') ib,(xib(i,1,ib),abs(xib(i,1,ib)),i=1,3)
@@ -2154,7 +2166,6 @@ Wavelengths: do iom=1,nom                                                       
                  write(24,*) pres(i,1,ise),pwg(i,1,ise),pot(i,1)
               enddo PressurePts
            enddo Sectns
-
            !Determine drift forces only if npres>0
            cxis  =motion(1,1)-yg(1)*motion(6,1)+zg(1)*motion(5,1)           !long. motion of c.o.g. of mass
            cetas =motion(2,1)-zg(1)*motion(4,1)+xg(1)*motion(6,1)         !transv. motion of c.o.g. of mass
@@ -2187,5 +2198,19 @@ Wavelengths: do iom=1,nom                                                       
       enddo WaveDir
    enddo Speeds
 enddo Wavelengths
+
+! Dump RAO data into output file - P.G. and T.B. Apr 2013
+open(7,file=TRIM(pathName)//'raoTable.out',status=merge('old    ','replace',.not.lsect))
+write(7, *)'# RAO Table'
+write(7, *)'# Data presented is magnitude RAO'
+write(7, *)'# Wavelength   Velocity   Angle   RAOsurge   RAOdrift   RAOheave   RAOroll   RAOpitch   RAOsway'
+do imu=1,nmu ! Wave directions
+  do iv=1,nv ! Speeds
+    do iom=1,nom          ! Wavelengths   
+      write(7, '(3f8.2,8f15.3 )')wavelength(iom),speed(iv),mu(imu)*180/pi, rao(1,iv,imu,iom), rao(2,iv,imu,iom), &
+            rao(3,iv,imu,iom),  rao(4,iv,imu,iom),  rao(5,iv,imu,iom),  rao(6,iv,imu,iom)
+    end do
+  end do
+end do
 call signampl                       !calculate significant amplitudes in natural seaways if required
 end program pdstrip

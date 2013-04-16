@@ -1,7 +1,7 @@
 0 t t f
 Example Yacht 1 testfile March 2006
 9.81 1.000 0.9652 -1e6 999.
-1 90
+3 1 45 90
 geomet.out
 
 f
@@ -31,8 +31,8 @@ f
 
 0  motion points
 
-6
-6.0 9.0 13.5 18.0 24.0 36.0               wave length
+25
+2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50               wave length
 
 1
 0.0 t            1 speed
