@@ -182,17 +182,20 @@ void hullform::sort(){
 bool hullform::writeSectionDef(QString filename){
   int i;
   FILE *outputFile;
-
+//  printf("Exporting sections into %s\n",filename.toAscii().data());
+//  printf("Establishing extents\n");
   extents();
-
+//  printf("Opening file\n");
   outputFile=fopen(filename.toAscii().data(),"w");
   if (outputFile==NULL) return false;
-
+//  printf("Removing short sections\n");
   removeShortSections();
+//  printf("Translating so baseline is at z=0\n");
   translate(0,0,-min.z);
 
   fprintf(outputFile,"%i T %lf\n",(int)sect.size(),waterline-min.z);
   for (i=(int)sect.size()-1;i>=0;i--){
+//    printf("Section %i\n",i);
     sect[i].export_section(outputFile);
   }
   fclose(outputFile);
