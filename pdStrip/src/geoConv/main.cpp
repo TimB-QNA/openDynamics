@@ -29,12 +29,12 @@ int main(int argc, char *argv[]){
     if (strcmp(argv[i],"-h")==0)     help();
   }
 
-  if (iType=="section"){
+  if (iType.toLower()=="section"){
     printf("Reading existing hullform from pdstrip sections file\n");
     if (!hull.readSectionDef(input)) return 1;
   }
 
-  if (iType=="ghs"){
+  if (iType.toLower()=="ghs"){
     printf("Reading existing hullform from GHS file\n");
     if (!hull.readGhsDef(input)) return 1;
   }
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
   hull.trimAboveWaterline();
   hull.sort();
 
-  if (oType=="point"){
+  if (oType.toLower()=="point"){
     printf("Writing hullform as point definition ");
     if (GNUPlot){
       printf("with GNUPlot compatibility");
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
     if (!hull.writePointDef(output, GNUPlot)) return 2;
   }
 
-  if (oType=="section"){
+  if (oType.toLower()=="section"){
     printf("Writing hullform as pdStrip section definition\n");
     if (!hull.writeSectionDef(output)) return 2;
   }
