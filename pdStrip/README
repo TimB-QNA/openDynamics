@@ -1,37 +1,54 @@
-1   DESCRIPTION
+###1. DESCRIPTION
 
 PDSTRIP is a hydrodynamic strip code for seakeeping. It computes ship motions
 for monohulls including sailing boats.
 
 
-2   COMPILATION ON LINUX
+###2. PREREQUISITES
+Building and using pdStrip will require some additional packages.
 
-1) Specify your compiler in the Makefile
-2) type make
+* git
+* gcc
+* g++
+* qt5-qmake
+* qt-sdk
+* gnuplot
+* gfortran
+
+If you are in Ubuntu (or other Debian based distribution) you can install these by issuing the following command
+
+ `sudo apt-get install git gcc g++ qt5-qmake qt-sdk gnuplot gfortran`
+
+###3. COMPILATION ON LINUX
+
+1. Specify your compiler in the Makefile (in a default Linux installation this will automatically be set to the gcc compiler)
+
+2. type make
 
 
-3   EXAMPLE USAGE ON LINUX
+###4. EXAMPLE USAGE ON LINUX
 
-1) change directory to examples
-2) run the example with the following command:
+1. change directory to examples
 
-   ../pdstrip pdstrip.inp
+2. run the example with the following command:
+
+`../bin/pdstrip pdstrip.inp`
 
 
-4   NOTES ON COMPILATION ON WINDOWS
+###5. NOTES ON COMPILATION ON WINDOWS
 
 pdstrip.f90 is known to crash the Salford FTN95 compiler versions 4.7.1 and 4.8.0.
 Version 4.7.x works if you choose the "Win32 debug" or "Win32 release" compiler
 option.
 
 
-5   EXAMPLE USAGE ON WINDOWS
+###6. EXAMPLE USAGE ON WINDOWS
 
-1) open a command prompt
-2) change directory to examples
-3) run the program with the following command
+1. open a command prompt
+2. change directory to examples
+3. run the program with the following command
 
-   ..\pdstrip.EXE pdstrip.inp
+`..\pdstrip.EXE pdstrip.inp`
 
 
 As a Windows user you may also use the graphical interface called PdStripGui.EXE.
