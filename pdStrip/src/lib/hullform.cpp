@@ -63,7 +63,6 @@ void hullform::extents(){
 void hullform::trimAboveWaterline(){
   int i, j;
   double f;
-  bool ptMoved;
   vector<point> tmpPT;
   point d;
 
@@ -182,11 +181,11 @@ void hullform::sort(){
 bool hullform::writeSectionDef(QString filename){
   int i;
   FILE *outputFile;
-//  printf("Exporting sections into %s\n",filename.toAscii().data());
+//  printf("Exporting sections into %s\n",filename.toLatin1().data());
 //  printf("Establishing extents\n");
   extents();
 //  printf("Opening file\n");
-  outputFile=fopen(filename.toAscii().data(),"w");
+  outputFile=fopen(filename.toLatin1().data(),"w");
   if (outputFile==NULL) return false;
 //  printf("Removing short sections\n");
   removeShortSections();
@@ -212,7 +211,7 @@ bool hullform::readSectionDef(QString filename){
   FILE *inputFile;
   section tempSection;
 
-  inputFile=fopen(filename.toAscii().data(),"r");
+  inputFile=fopen(filename.toLatin1().data(),"r");
   if (inputFile=='\0') return false;
   // First line contains symmetry data. Ignore for now.
   fgets(line,4096,inputFile);
@@ -239,7 +238,7 @@ bool hullform::readGhsDef(QString filename){
   FILE *inputFile;
   section tempSection;
 
-  inputFile=fopen(filename.toAscii().data(),"r");
+  inputFile=fopen(filename.toLatin1().data(),"r");
   if (inputFile=='\0') return false;
   // First three lines contain various non-section data.
   for (i=0;i<4;i++){
@@ -276,7 +275,7 @@ bool hullform::writePointDef(QString filename,bool GNUPlot=false){
   int i;
   FILE *outputFile;
 
-  outputFile=fopen(filename.toAscii().data(),"w");
+  outputFile=fopen(filename.toLatin1().data(),"w");
   if (outputFile==NULL) return false;
 
   for (i=0;i<(int)sect.size();i++){
@@ -299,18 +298,18 @@ void hullform::generatePanels(){
   int i, j, k;
   panel tmpPan;
 
-  for (i=0;i<sect.size()-1;i++){
+  for (i=0;i<(int)sect.size()-1;i++){
 //    printf("Starting Section %i\n",i);
-    for (j=0;j<sect[i].pt.size();j++){
+    for (j=0;j<(int)sect[i].pt.size();j++){
 
-      if (sect[i+1].pt.size()>j+1){
+      if ((int)sect[i+1].pt.size()>j+1){
         tmpPan.pt[0]=sect[i].pt[j];
         tmpPan.pt[1]=sect[i+1].pt[j];
         tmpPan.pt[2]=sect[i+1].pt[j+1];
         pan.push_back(tmpPan);
 //        printf("Creating Standard Panel");
 
-        if (j<sect[i].pt.size()-1){
+        if (j<(int)sect[i].pt.size()-1){
           tmpPan.pt[0]=sect[i].pt[j];
           tmpPan.pt[1]=sect[i+1].pt[j+1];
           tmpPan.pt[2]=sect[i].pt[j+1];
@@ -323,7 +322,7 @@ void hullform::generatePanels(){
 
     if (sect[i+1].pt.size()>sect[i].pt.size()){
       k=sect[i].pt.size()-1;
-      for(j=k;j<sect[i+1].pt.size();j++){
+      for(j=k;j<(int)sect[i+1].pt.size();j++){
         tmpPan.pt[0]=sect[i].pt[k];
         tmpPan.pt[1]=sect[i+1].pt[j];
         tmpPan.pt[2]=sect[i].pt[j+1];

@@ -15,23 +15,22 @@ panel::panel(){
  * We use Heron's formula to calculate the panel's area based on it's side lengths.
  */
 double panel::area(){
-  int a, b, c, i;
-  double f, dx,dy,dz, st, st0,st1,st2, sp, sp0,sp1,sp2;
+  double dx,dy,dz, st, st0,st1,st2; //, sp, sp0,sp1,sp2; sp is 2D only solution
   double area;
   vector<int> idx;
-  panel tri[2];
 
   // We use Heron's formula here for both projected and total area
   dx=pt[0].x-pt[1].x; dy=pt[0].y-pt[1].y; dz=pt[0].z-pt[1].z;
-  st0=sqrt(dx*dx+dy*dy+dz*dz); sp0=sqrt(dx*dx+dy*dy);
+  st0=sqrt(dx*dx+dy*dy+dz*dz); // sp0=sqrt(dx*dx+dy*dy);
 
   dx=pt[1].x-pt[2].x; dy=pt[1].y-pt[2].y; dz=pt[1].z-pt[2].z;
-  st1=sqrt(dx*dx+dy*dy+dz*dz); sp1=sqrt(dx*dx+dy*dy);
+  st1=sqrt(dx*dx+dy*dy+dz*dz); // sp1=sqrt(dx*dx+dy*dy);
 
   dx=pt[2].x-pt[0].x; dy=pt[2].y-pt[0].y; dz=pt[2].z-pt[0].z;
-  st2=sqrt(dx*dx+dy*dy+dz*dz); sp2=sqrt(dx*dx+dy*dy);
+  st2=sqrt(dx*dx+dy*dy+dz*dz); // sp2=sqrt(dx*dx+dy*dy);
 
-  st=.5*(st0+st1+st2); sp=.5*(sp0+sp1+sp2);
+  st=.5*(st0+st1+st2);
+//  sp=.5*(sp0+sp1+sp2);
   area=sqrt(st*(st-st0)*(st-st1)*(st-st2));
   return area;
 }
@@ -42,9 +41,7 @@ double panel::area(){
  */
 double panel::areaXY(){
   double sp, sp0,sp1,sp2;
-  double area;
   vector<int> idx;
-  panel tri[2];
   point d;
 
   d=pt[0]-pt[1]; sp0=sqrt(pow(d.x,2)+pow(d.y,2));
@@ -68,10 +65,6 @@ double panel::areaXY(){
  * the immersed section.
  */
 double panel::calculatePrismVolume(double waterline){
-  int a, b, c, i;
-  double f, dx,dy,dz, st, st0,st1,st2, sp, sp0,sp1,sp2;
-  vector<int> idx;
-  vector<panel> tri;
   point cent;
   cent=centroid();
   if (cent.z>waterline) return 0.;
