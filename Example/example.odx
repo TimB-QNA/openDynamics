@@ -1,0 +1,71 @@
+<opendynamics>
+  <world> 
+    <simulation>
+      <timestep>0.01</timestep>
+      <endTime>600</endTime>
+    </simulation>
+    <seastate>    
+      <height>0</height>
+      <type>1</type>
+      <period min="5" max="20"/>
+      <frequencies>30</frequencies>
+      <heading>45</heading>
+      <rampTime>15</rampTime>
+    </seastate>
+    
+    <vessel>
+      <dynamics>
+        <position x="0" y="0" z="0.00675"/>
+        <velocity x="0" y="0" z="0"/>
+        <attitude x="0" y="-0.325" z="0"/>
+        <damping angular="0.01" linear="0.01"/>
+      </dynamics>
+      <mesh reference="Hull">
+        <filename>35_HullAndDeck.stl</filename>
+      </mesh>
+      <mesh reference="Bulb">
+        <filename>35_Bulb.stl</filename>
+      </mesh>
+      <mesh reference="Fin">
+        <filename>35_Fin.stl</filename>
+      </mesh>
+      <mesh reference="Rudder">
+        <filename>35_Rudder.stl</filename>
+      </mesh>
+
+      <hull>
+        <mesh>Hull</mesh>
+        <resistance type="delft">
+          <model>0</model>
+          <waterline>10.0</waterline>
+        </resistance>
+      </hull>
+      
+      <foil>
+        <type>rudder</type>
+        <mesh>Rudder</mesh>
+        <stock>
+          <origin x="-4.500" y="0" z="-0.123"/>
+          <end x="-4.449" y="0" z="0.191"/>
+          <angle>15</angle>
+        </stock>
+        <section>
+          <leadingEdge x="-4.3" y="0" z="0"/>
+          <trailingEdge x="-4.8" y="0" z="0"/>
+        </section>
+        <section>
+          <leadingEdge x="-4.5" y="0" z="-2"/>
+          <trailingEdge x="-4.8" y="0" z="-2"/>
+        </section>
+      </foil>
+
+      <mass>
+        <mesh mass="5200">Hull</mesh>
+        <mesh density="2000" thickness="0.06">Fin</mesh>
+        <mesh mass="500">Bulb</mesh>
+        <mesh density="800" thickness="0.06">Rudder</mesh>
+      </mass>
+
+    </vessel>
+  </world>
+</opendynamics>

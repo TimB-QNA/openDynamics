@@ -1,0 +1,7 @@
+\chapter{System Architecture}
+\section{The input XML file}
+The input XML file is critical. It defines the parameters of the simulation and the properties of the vessel(s), moorings etc.
+
+\section{Basic Concepts}
+openDynamics has a "world" wherein all dynamics simulation happens. The odWorld class implements this "world" and loads the dynamics objects from the input XML file. Each object within the simulation (whether a physical or not) inherits odObject. odObject allows significant simplification in the software, and provides a common interface to everything in the simulation. Objects can interact with each other either by velocity influence, water surface displacement or direct application of forces (e.g. moorings).
+

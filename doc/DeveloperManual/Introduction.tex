@@ -1,0 +1,9 @@
+\chapter{Introduction}
+openDynamics was initially the formalisation of some quite simple ideas for the balancing of hydrostatics problems. In a hydrostatics problem, it is normal to hold one variable constant, and change another to minimise a certain derived quantity. For example, to work out righting moment, roll angle would be fixed, and heave would be changed to minimise the difference between buoyancy and weight; pitch can also be varied to reduce pitching moment. From this premise, it was a straightforward step to use a basic 2DOF dynamics solution instead of using a control mechanism. The generic 2nd order differential equation is described in \ref{eq:ode}. This can be solved numerically for two degrees of freedom (heave and pitch) reasonably easily, and for a hydrostatic solution, the degrees of freedom can be decoupled; with limited coupling derived from the geometry and associated motion.
+
+\begin{equation}
+M\frac{d^2_x}{dt^2} + A\frac{dx}{dt} + Cx = 0
+\label{eq:ode}
+\end{equation}
+
+Hydrostatic solutions, while extemely useful only have limited applicability when considering more dynamic situations. For more dynamic scenarios like a yacht sailing through waves, or mooring loads, the solution needs to take into account the full 6DOF problem with the correct cross-coupling terms. openDynamics uses the Open Dynamics Engine library \cite{ODE} for this purpose. ODE is a general 6DOF dynamics engine, which works by applying user-defined forces to bodies. ODE is also capable of modelling articuated bodies, though this is not extensively used in openDynamics. 

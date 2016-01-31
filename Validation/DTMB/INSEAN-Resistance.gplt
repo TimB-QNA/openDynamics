@@ -1,0 +1,9 @@
+set output "DTMB-INSEAN.png"
+set terminal png
+set grid
+
+set title "DTMB Resistance\nModel Scale - INSEAN DATA"
+set ylabel "Total Resistance (N)"
+set xlabel "Speed (m/s)"
+
+plot 'INSEAN-Resistance.txt' using 1:(9.81*$3) with linespoints notitle

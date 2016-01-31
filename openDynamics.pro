@@ -1,2 +1,3 @@
 TEMPLATE = subdirs
-SUBDIRS  = pdStrip
+SUBDIRS  = pdStrip \
+           src
