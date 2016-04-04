@@ -38,6 +38,7 @@ class odObject
     virtual odPoint velocityInfluence(odPoint pos);
     odPoint localVelocity(odPoint pos, int fUid);
     
+    virtual void advanceSolver();
     virtual void run();
     virtual void preSolveSetup();
     virtual void postAdvance();

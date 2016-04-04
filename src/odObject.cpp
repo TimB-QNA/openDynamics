@@ -144,6 +144,10 @@ void odObject::preSolveSetup(){
   openDataStream("odObject");
 }
 
+void odObject::advanceSolver(){
+  run();
+}
+    
 void odObject::run(){
   volumetricSolver();
 }

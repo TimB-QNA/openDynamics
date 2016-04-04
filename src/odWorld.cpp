@@ -60,7 +60,6 @@ void odWorld::setupReferences(){
   for (i=0; i<vessel.size(); i++){
     vessel[i].simTime=&simTime;
     for (j=0; j<vessel[i].component.size(); j++){
-      vessel[i].component[j]->uid=comp;
       vessel[i].component[j]->constants=&constants;
       vessel[i].component[j]->odeBody=&vessel[i].odeBody;
       vessel[i].component[j]->timeStep=&timeStep;
@@ -68,6 +67,7 @@ void odWorld::setupReferences(){
       comp++;
     }
   }
+  comp+=cables.size();
   
   // create the object list
   printf("Found %i components\n",comp);
@@ -86,6 +86,10 @@ void odWorld::setupReferences(){
       comp++;
     }
   }
+  for (i=0; i<cables.size(); i++){
+    objectList[comp] = &cables[i];
+    comp++;
+  }
   
   // and propogate it suitably.
   seastate.allObjects = objectList;
@@ -96,7 +100,19 @@ void odWorld::setupReferences(){
       vessel[i].component[j]->nObjects=nObjects;
     }
   }
-
+  
+  for (i=0; i<cables.size(); i++){
+    cables[i].allObjects = objectList;
+    cables[i].nObjects=nObjects;
+  }
+  
+  // Propogate constants etc.
+  for (i=0;i<nObjects;i++){
+    objectList[i]->constants=&constants;
+    objectList[i]->timeStep=&timeStep;
+    objectList[i]->simTime=&simTime;
+    objectList[i]->uid=i;
+  }
 }
 
 
@@ -159,7 +175,7 @@ void odWorld::initialiseSolver(){
   char fname[80];
   
   world = dWorldCreate();
-  dWorldSetERP(world, 0.05);
+  dWorldSetERP(world, 1);
   dWorldSetQuickStepNumIterations(world, 10);
   dWorldSetGravity(world, 0, 0, -constants.g);
   
@@ -224,11 +240,6 @@ void odWorld::run(){
   start=clock();
   for (i=0;simTime<=endTime;i++){
     constants.simTime=simTime;
-    if (simTime<3){
-      dWorldSetERP(world, 0.2);
-    }else{
-      dWorldSetERP(world, 1.0);
-    }
     printf("Simulation time=%lf\n",simTime);
     advanceSolver();
   
@@ -260,6 +271,9 @@ void odWorld::advanceSolver(){
   int i;
   for (i=0; i<vessel.size(); i++){
     vessel[i].advanceSolver();
+  }
+  for (i=0; i<cables.size(); i++){
+    cables[i].advanceSolver();
   }
   
   dSpaceCollide (space, this ,&nearCallback);
