@@ -1,5 +1,5 @@
 #include "odPropeller.h"
-#include "Wageningen-BSeries/wageningenB.h"
+#include "wageningenB.h"
 
 #ifdef GRAPHICS
   #include <vtkStructuredGrid.h>
