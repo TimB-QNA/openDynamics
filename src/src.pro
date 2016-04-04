@@ -34,7 +34,7 @@ HEADERS += odWaves.h \
            odTerrain.h \
            odPropeller.h \
            odPropellerModel.h \
-           Wageningen-BSeries/wageningenB.h
+           wageningenB.h
 
 SOURCES += main.cpp \
            odWaves.cpp \
@@ -61,7 +61,7 @@ SOURCES += main.cpp \
            odTerrain.cpp \
            odPropeller.cpp \
            odPropellerModel.cpp \
-           Wageningen-BSeries/wageningenB.cpp
+           wageningenB.cpp
 
 INCLUDEPATH += $$[QT_INSTALL_HEADERS]/openDynamics $$[QT_INSTALL_HEADERS]/OpenPilot /usr/include/vtk-5.8/ opennurbs
 
