@@ -22,6 +22,7 @@ class odCable : public odObject
   private:
     int nSegments;
     double length, weight, diameter;
+    double angularDamping, linearDamping;
    
     odPoint pos1, pos2, E1;
     odBody *body1, *body2;

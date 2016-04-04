@@ -3,6 +3,8 @@
 odCable::odCable() : odObject(){
   nSegments=10; // reasonable default.
   vtksuffix="vtp";
+  linearDamping=0.05;
+  angularDamping=0.01;
 }
 
 QString odCable::type(){
@@ -33,7 +35,7 @@ void odCable::setupBody(dWorldID *world, dSpaceID space){
   double dd, s, rs;
   dVector3 OP;
   odPoint loc1, loc2, d, P, c;
-  dMass m;
+  dMass *m;
   dGeomID geometry[nSegments];
 //  dQuaternion align;
   dReal align[4];
@@ -64,14 +66,15 @@ void odCable::setupBody(dWorldID *world, dSpaceID space){
   printf("Creating elements\n");
   for (i=0;i<nSegments;i++){
     element[i] = dBodyCreate (*world);
-//    dBodySetDamping(element[i], 0.1, 0.6);
-    dMassSetBox (&m, weight*segLen, segLen, diameter, diameter);
-    dMassAdjust (&m, weight*segLen);
-    dBodySetMass (element[i], &m);
+    dBodySetDamping(element[i], linearDamping, angularDamping);
+    m=new dMass;
+    dMassSetBoxTotal(m, weight*segLen, segLen, diameter, diameter);
+    dMassAdjust (m, weight*segLen);
+    dBodySetMass (element[i], m);
     x=((double)i+.5)*segLen;
     dBodySetPosition(element[i], x, 0, 0);
-    geometry[i] = dCreateBox(space, length, diameter, diameter);
-    dGeomSetBody(geometry[i], element[i]);
+//    geometry[i] = dCreateBox(space, length, diameter, diameter);
+//    dGeomSetBody(geometry[i], element[i]);
   }
   printf("Creating internal joints\n");
   for (i=0;i<nSegments-1;i++){
@@ -107,7 +110,8 @@ void odCable::setupBody(dWorldID *world, dSpaceID space){
   dJointSetBallAnchor (end1, 0, 0, 0);
   end1Feedback = new dJointFeedback;
   dJointSetFeedback (end1, end1Feedback);
-  
+
+/*  
   printf("Creating end joint 2\n");  
   end2 = dJointCreateBall(*world,0);
   if (body2!=NULL){
@@ -117,8 +121,9 @@ void odCable::setupBody(dWorldID *world, dSpaceID space){
   }
 //  dJointSetBallAnchor (end2, loc2.x, loc2.y, loc2.z);
   dJointSetBallAnchor (end2, nSegments*segLen, 0, 0);
+  */
   end2Feedback = new dJointFeedback;
-  dJointSetFeedback (end2, end1Feedback);
+  dJointSetFeedback (joint[0], end2Feedback);
 }
 
 
@@ -135,9 +140,62 @@ void odCable::preSolveSetup(){
 }
 
 void odCable::run(){
+  int i;
+  double pi=4.*atan(1.);
+  double volume, segLen, rho, x, u, w, alpha, uwMag, alphaMap;
+  odPoint P0, F, V, axial, radial;
+  dVector3 P;
+  
   // The opendynamics solver handles connections by default (unless we wish to do something odd with them).
 //  dBodyAddRelForceAtRelPos(element[nSegments-1], 50, 0, 50, 0, 0, 0);
 
+  // Axial and radial directions in local element co-ordinates.
+  axial=odPoint(1,0,0);
+  radial=odPoint(0,0,1);
+  
+  segLen=length/(double)nSegments;
+  volume=pi*pow((diameter/2),2)*segLen;
+  for (i=0;i<nSegments;i++){
+    // Temporarily make the current element the active body...
+    odeBody=&element[i];
+    // Add buoyant force...
+    dBodyGetRelPointPos(element[i], 0, 0, 0, P);
+    P0=odPoint(P[0],P[1],P[2]);
+    rho=density(P0);
+    V=localVelocity(P0, uid);
+//    printf("Centre Location = %lf\t%lf\t%lf\t\n", P[0], P[1], P[2]);
+    F=odPoint(0,0,1)*constants->g*volume*rho;
+//    printf("Volume = %lf\n", volume);
+//    printf("Density= %lf\n", density(odPoint(P[0],P[1],P[2])));
+//    printf("Buoyant Force = %lf\t%lf\t%lf\n", F.x, F.y, F.z);
+//    dBodyAddForceAtRelPos(element[nSegments-1], F.x, F.y, F.z, 0, 0, 0);
+
+    if (i==0){
+      // Add resistance force...
+      V.x=1;
+      V.y=0;
+      V.z=0;
+      
+      printf("Flow Speed = %lf\t%lf\t%lf\n", V.x, V.y, V.z);
+    
+      u=radial.dotProduct_natural(-V);
+      w=axial.dotProduct_natural(-V);
+      uwMag=sqrt(u*u+w*w);
+      printf("u=%lf\tw=%lf\tuwMAG=%lf\n",u,w,uwMag);
+      alpha=atan2(w,u);
+      printf("Alpha %lf\n",alpha*180./pi);
+      // map to 0-90 range for convenience...
+      alphaMap=fabs(alpha*180./pi);
+      if (alphaMap>90) alphaMap=90-alphaMap;
+      printf("AlphaMap %lf\n",alphaMap);
+    
+//    x=0.5*rho*V.mag()*segLen*diameter*0.5;
+//    if (*simTime<20.) x*=*simTime/20.;
+//    F=-V/V.mag()*x; // Multiply by the inverse of the velocity vector (if the body is moving with v- then drag is in the direction of v+
+      printf("Drag Force = %lf\t%lf\t%lf\n", F.x, F.y, F.z);
+//    dBodyAddForceAtRelPos(element[nSegments-1], F.x, F.y, F.z, 0, 0, 0);
+    }
+  }
 }
 
 void odCable::postAdvance(){
@@ -145,9 +203,12 @@ void odCable::postAdvance(){
   end1Feedback=dJointGetFeedback(end1);
   F=odPoint(end1Feedback->f1[0], end1Feedback->f1[1], end1Feedback->f1[2]);
   fprintf(forcesFile,"%lf\t%lf\t%lf\t%lf\t", F.x, F.y, F.z, F.mag());
-  end2Feedback=dJointGetFeedback(end2);
-  F=odPoint(end2Feedback->f1[0], end2Feedback->f1[1], end2Feedback->f1[2]);
-  fprintf(forcesFile,"%lf\t%lf\t%lf\t%lf\n", F.x, F.y, F.z, F.mag());
+//  end2Feedback=dJointGetFeedback(end2);
+//  F=odPoint(end2Feedback->f1[0], end2Feedback->f1[1], end2Feedback->f1[2]);
+//  fprintf(forcesFile,"%lf\t%lf\t%lf\t%lf\n", F.x, F.y, F.z, F.mag());
+//  end2Feedback=dJointGetFeedback(joint[0]);
+//  F=odPoint(end2Feedback->f1[0], end2Feedback->f1[1], end2Feedback->f1[2]);
+//  printf("Joint force %lf\t%lf\t%lf\n", F.x, F.y, F.z);
 }
 
 /*!
@@ -172,6 +233,10 @@ void odCable::readFromXML(QDomNode root){
     if (element.tagName().toLower()=="segments")        nSegments=element.text().toInt();   // Must always be an even number
     if (element.tagName().toLower()=="weight")          weight=element.text().toDouble();   // Weight in Kg/m
     if (element.tagName().toLower()=="diameter")        diameter=element.text().toDouble();
+    if (element.tagName().toLower()=="damping"){
+      angularDamping=element.attribute("angular").toDouble();
+      linearDamping=element.attribute("linear").toDouble();
+    }
     node=node.nextSibling();
   }
   
@@ -209,8 +274,8 @@ void odCable::exportJointVTK(FILE *stream){
     dJointGetBallAnchor (joint[i],P);
     fprintf(stream,"%lf %lf %lf\n", P[0], P[1], P[2]);
   }
-  dJointGetBallAnchor(end2,P);
-  fprintf(stream,"%lf %lf %lf\n", P[0], P[1], P[2]);
+//  dJointGetBallAnchor(end2,P);
+//  fprintf(stream,"%lf %lf %lf\n", P[0], P[1], P[2]);
   fprintf(stream,"      </DataArray>\n");
   fprintf(stream,"    </Points>\n");
   
