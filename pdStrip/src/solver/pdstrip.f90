@@ -89,7 +89,7 @@ write(6,'( '' z of water bottom             '',g12.3)') zbot
 write(6,'( '' z for water drift velocity    '',f 8.3)') zdrift
 write(6,'( '' Wave encounter angles         '',(10f8.3))') wangl(1:nmu)
 write(6,'(a,a)') ' Offset file name: ',trim(offsetfile)
-if (nmu>nmumax) stop'>> Too many wave angles'
+if (nmu>nmumax) stop '>> Too many wave angles'
 if (zbot>0) write(6,*)'*** positive bottom z coordinate appears unreasonable'
 zwl=-zwl; zbot=-zbot; zdrift=-zdrift                      !change from input to output coord. system
 if (lsect) then
@@ -101,10 +101,10 @@ read(9,*) nse,sym,tg                                  !number of sections, symme
 write(6,'(a,i8  )') ' Number of sections            ',nse
 write(6,'(a,a   )') ' Symmetry?                     ',merge('     yes','      no',sym)
 write(6,'(a,f8.3)') ' Reference draft               ',tg
-if (nse>nsemax) stop'>> Too many sections'
-if (tg<=0) stop'>> Reference draft should be positive'
-if (sym.and.npres/=0) stop'>> Pressure calculation requires sym=.false'
-if (npres==1 .or. npres==2) stop'>> Min. 3 pressure points per section required. 0 or more than 15 recommended'
+if (nse>nsemax) stop '>> Too many sections'
+if (tg<=0) stop '>> Reference draft should be positive'
+if (sym.and.npres/=0) stop '>> Pressure calculation requires sym=.false'
+if (npres==1 .or. npres==2) stop '>> Min. 3 pressure points per section required. 0 or more than 15 recommended'
 om(1:nfre)=sqrt(fp(1:nfre)*g/tg)                   !circular fr. resulting from frequency parameters
 Sections: do ise=1,nse
    read(9,*) x(ise),nof(ise),ngap,gap(1:ngap)               !section x coord., no. of offsets, gap data
@@ -113,7 +113,7 @@ Sections: do ise=1,nse
    if (ngap>0) write(6,'(a,10i5)') ' Gaps following point no.',gap(1:ngap)
    write(6,'(" y:",8f10.3)') yof(ise,1:nof(ise))
    write(6,'(" z:",8f10.3)') zof(ise,1:nof(ise))
-   if (sym.and.yof(ise,1)/=0)stop'First y must be 0 for symmetrical body'
+   if (sym.and.yof(ise,1)/=0)stop 'First y must be 0 for symmetrical body'
    yof(ise,1:nof(ise))=-yof(ise,1:nof(ise))
    zof(ise,1:nof(ise))=-zof(ise,1:nof(ise))                 !change from input to output coord. system
    area(ise)=0; ys(ise)=0; zs(ise)=0            !compute area etc. gaps covered 2 times if sym=.false.
@@ -142,8 +142,8 @@ Sections: do ise=1,nse
       subm=.true.; write(6,*) 'fully submerged'
    else
       subm=.false.
-      if (zof(ise,nof(ise))/=zwl) stop'>> Last z must be equal to zwl'
-      if (.not.sym.and.zof(ise,1)/=zwl) stop'>> First z must be equal to zwl'
+      if (zof(ise,nof(ise))/=zwl) stop '>> Last z must be equal to zwl'
+      if (.not.sym.and.zof(ise,1)/=zwl) stop '>> First z must be equal to zwl'
    endif
    yof1(1:nof(ise))=yof(ise,1:nof(ise)); zof1(1:nof(ise))=zof(ise,1:nof(ise))
    if (lsect) then
@@ -188,7 +188,7 @@ complex:: addedmprel(2,2)              !preliminary added mass matrix (1 or 2 de
 complex:: diffprel(2,nmumax)           !preliminary diffraction force
 complex:: frkrprel(2,nmumax)           !preliminary Froude-Krilow force
 complex:: pr(nprmax,3+nmumax,nfremax)  !pressure amplitudes
-if (nfre.gt.nfremax) stop'>> Too many frequencies'
+if (nfre.gt.nfremax) stop '>> Too many frequencies'
 call testsuitability(nof1,yof1,zof1)                            !discretization of section suitable?
 girth(1)=0.
 do i=2,nof1
@@ -294,10 +294,10 @@ complex:: diff1(3,nmu)                 !diffraction force amplitude, one frequen
 complex:: frkr1(3,nmu)                 !Froude-Krilow force amplitude, one frequency, one section
 complex:: zw1,zw2,zw1a,zw2a            !complex intermediate numbers
 
-if (nof1.gt.100) stop'***  Too many (>100) points on section.'
-if (nof1+nfs>nofmax) stop'*** Too many body + waterline panels'
-if (nmu.gt.nmumax) stop'*** Too many angles'
-if (.not.subm.and.(abs(zof1(1)-zwl)>0.001.or.abs(zof1(nof1)-zwl) >0.001)) stop'*** First or last section point not on waterline'
+if (nof1.gt.100) stop '***  Too many (>100) points on section.'
+if (nof1+nfs>nofmax) stop '*** Too many body + waterline panels'
+if (nmu.gt.nmumax) stop '*** Too many angles'
+if (.not.subm.and.(abs(zof1(1)-zwl)>0.001.or.abs(zof1(nof1)-zwl) >0.001)) stop '*** First or last section point not on waterline'
 addedm1=0.; diff1=0; pr=0
 TwoFreeSurfaceDiscretisations: do nf=25,28,3
    ciom=(0.,1.)*om
@@ -350,7 +350,7 @@ TwoFreeSurfaceDiscretisations: do nf=25,28,3
       WaveAngles: do iw=1,nmu
          sinw=sin(wangl(iw)*pi/180)
          zw1=cmplx(-waven*dz,waven*sinw*dy)
-         if (abs(zw1)>50.) stop'>> Frequency too high'
+         if (abs(zw1)>50.) stop '>> Frequency too high'
          if (abs(zw1).lt.0.001) zw1=0.001
          zw1a=-conjg(zw1)
          zw2=exp(waven*cmplx(-zof1(k)+zwl,yof1(k)*sinw))* merge((exp(zw1)-1.)/zw1,1.+0.5*zw1,abs(zw1 )>0.01)
@@ -397,7 +397,7 @@ TwoFreeSurfaceDiscretisations: do nf=25,28,3
 
    a(0,0:nof1-ngap+2*nfs-1)=1.                                           ! sum of source strengths = 0
    call simqcd(a(0,0),nof1-ngap+2*nfs,3+nmu,nofmax+1,is,1.e-5,detl)             !solve equation system
-   if (is.ne.0) stop'*** Singular equation system. Coinciding offset points?'
+   if (is.ne.0) stop '*** Singular equation system. Coinciding offset points?'
 
    !Added mass and diffraction calc. by pressure integration over section contour
    Forces: do m=1,3                                 !for transverse force, vertical force, roll moment
@@ -481,10 +481,10 @@ complex:: diff1(ndof,nmu)              !diffraction force amplitude, one section
 complex:: frkr1(ndof,nmu)              !Froude-Krilow force amplitude, one section
 complex:: zw1,zw2,zw1a,zw2a            !intermediate values
 
-if (nof1.gt.50) stop'*** Too many points on section. should be <=50'
-if (ndof.ne.1.and.ndof.ne.2) stop'*** Incorrect ndof. should be 1 or 2'
-if (nmu.gt.nmumax) stop'*** Too many angles'
-if (nof1+nfs>nofmax) stop'*** Too many body + waterline panels'
+if (nof1.gt.50) stop '*** Too many points on section. should be <=50'
+if (ndof.ne.1.and.ndof.ne.2) stop '*** Incorrect ndof. should be 1 or 2'
+if (nmu.gt.nmumax) stop '*** Too many angles'
+if (nof1+nfs>nofmax) stop '*** Too many body + waterline panels'
 addedm1=0.
 diff1=0.
 twofreesurfacediscretisations: do nf=25,28,3                   !uses two values nf; results averaged
@@ -541,8 +541,8 @@ twofreesurfacediscretisations: do nf=25,28,3                   !uses two values 
       WaveAngles: do iw=1,nmu
          sinw=sin(wangl(iw)*pi/180)
          zw1=cmplx(-waven*dz,waven*sinw*dy)
-         if (abs(zw1)>50) stop'>> Frequency too high'
-         if (abs(zw1).lt.0.001) zw1=0.001                       !stop'frequency too low' seems unnecessary
+         if (abs(zw1)>50) stop '>> Frequency too high'
+         if (abs(zw1).lt.0.001) zw1=0.001                       !stop 'frequency too low' seems unnecessary
          zw1a=-conjg(zw1)
          zw2 =exp(waven*cmplx(-zof1(k)+zwl,yof1(k)*sinw))* merge((exp(zw1 )-1.)/zw1,1.+0.5*zw1,abs(zw1)>0.01)
          zw2a=exp(waven*cmplx( zof1(k)-zwl,yof1(k)*sinw))* merge((exp(zw1a)-1.)/zw1a,1.+0.5*zw1a,abs(zw1a)>0.01)
@@ -593,7 +593,7 @@ twofreesurfacediscretisations: do nf=25,28,3                   !uses two values 
 
    if (ndof==1) a(0,0:nof1-ngap+nfs-1)=1.                      !sum of sources = 0 only in case ndof=1
    call simqcd(a(ndof-1,ndof-1),nof1-ngap+nfs+1-ndof,ndof+nmu,nofmax+1,is,1.e-5,detl) !solve equations
-   if (is.ne.0) stop'***  Singular equation system. Coinciding offset points?'
+   if (is.ne.0) stop '***  Singular equation system. Coinciding offset points?'
 
    Forces: do m=1,ndof                                             !ndof=1 heave, ndof=2 sway and roll
       MotionsAndWaves: do l=1,ndof+nmu                                    !m force index, l motion index
@@ -791,7 +791,7 @@ complex, intent(in),dimension(:,:):: ma,mb
 complex, dimension(size(ma,1),size(mb,2)):: prodmatr
 nra=size(ma,1); nca=size(ma,2)
 nrb=size(mb,1); ncb=size(mb,2)
-if (nca/=nrb) stop'>> Incompatible matrices in prodmatr'
+if (nca/=nrb) stop '>> Incompatible matrices in prodmatr'
 do i=1,nra; do j=1,ncb
    prodmatr(i,j)=sum(ma(i,1:nca)*mb(1:nrb,j))
 enddo; enddo
@@ -823,7 +823,7 @@ complex, intent(in), dimension(:,:):: ma,mb
 complex:: logmatr(size(ma,1),size(ma,2))
 nra=size(ma,1); nca=size(ma,2)
 nrb=size(mb,1); ncb=size(mb,2)
-if (mb(1,1)/=(999.,0.).and.(nra/=nrb.or.nca/=ncb)) stop'Incompatible matrices in logmatr'
+if (mb(1,1)/=(999.,0.).and.(nra/=nrb.or.nca/=ncb)) stop 'Incompatible matrices in logmatr'
 AllElements: do i=1,nra; do j=1,nca
    logmatr(i,j)=merge(log(ma(i,j)),(-60.,0.),ma(i,j)/=(0.,0.))
    if (mb(1,1)/=(999.,0.)) then                          !adapt phase angle for small difference to mb
@@ -910,7 +910,7 @@ open(22,status='scratch',form='unformatted')
 write(6,*)'Frequency    acceleration valuation factor'
 read(5,*) nfr,(fr(ifr),bewf(ifr),ifr=1,nfr)
 fr(1)=fr(1)+1.e-8
-if (nfr.gt.30) stop'>> Too many frequencies'
+if (nfr.gt.30) stop '>> Too many frequencies'
 write(6,'(f9.3,f20.3)') (fr(ifr),bewf(ifr),ifr=1,nfr)
 if (npres>0) read(24,*) ((ypr(i,ise),zpr(i,ise),i=1,npres),ise=1,nse)
 
@@ -919,7 +919,7 @@ Seaways: do
    if (text1.ne.text) then
       write(6,*)text1
       write(6,*)text
-      stop'>> File 21 does not fit to the input data'
+      stop '>> File 21 does not fit to the input data'
    endif
    read(21,*) nb,ls,g,rho,rml         !reads data for nmu,muf complemented to cover [-90 : 270] degrees
    read(21,*) nom,(rla(iom),iom=1,nom),nv,(vf(iv),iv=1,nv), &
@@ -957,7 +957,7 @@ Seaways: do
       rmgl=(merge(muf(imu-1),muf(nmu)-2*pi,imu>1)+muf(imu))/2.               !left end of interval
       rmbe=(merge(muf(imu+1),muf(1)+2*pi,imu<nmu)+muf(imu))/2.-rmgl          !range of interval
       if (rmbe>0.78.and.abs(rmgl-mainmu*pi/180)<0.5*pi) then
-         stop'>> The specified wave angles are not sufficient for this seaway'
+         stop '>> The specified wave angles are not sufficient for this seaway'
       end if
       npart=rmbe/0.02+1
       muin(imu)=0
@@ -1010,7 +1010,7 @@ Seaways: do
             ome=om(iom)-2.*pi/rla(iom)*vf(iv)*cos(muf(imu))
             fq=abs(ome)/2/pi                                                 !for valuation of accelerations
             ifr=which(nfr,fq<fr(1:nfr))
-            if (ifr==0) stop'Frequency range of acceleration valuation function unsufficient'
+            if (ifr==0) stop 'Frequency range of acceleration valuation function unsufficient'
             ifr=max(ifr,2)
             fint=(log(fq)-log(fr(ifr-1)))/(log(fr(ifr))-log(fr(ifr-1)))
             bw=exp(log(bewf(ifr-1))+fint*(log(bewf(ifr))-log(bewf(ifr-1))))
@@ -1362,8 +1362,8 @@ write(6,'(a,i3)') ' No. of pressure points per section ',npres
 write(6,'(a,a )') ' Section hydrodynamic data?         ',merge('yes',' no',lsect)
 write(6,'(a,a )') ' Transfer functions?                ',merge('yes',' no',ltrans)
 write(6,'(a,a )') ' Significant amplitudes?            ',merge('yes',' no',lsign)
-if (npres.gt.50) stop'>> Too many pressure points per section'
-if (lsect.and..not.ltrans.and.lsign) stop'>> Illegal combination of lsect,ltrans,lsign'
+if (npres.gt.50) stop '>> Too many pressure points per section'
+if (lsect.and..not.ltrans.and.lsign) stop '>> Illegal combination of lsect,ltrans,lsign'
 open(20,file=TRIM(pathName)//'sectionresults',status=merge('old    ','replace',.not.lsect))
 open(21,file=TRIM(pathName)//'responsefunctions',status=merge('old    ','replace',.not.ltrans.and.lsign))
 open(23,file=TRIM(pathName)//'relativemotions',status=merge('old    ','replace',.not.ltrans.and.lsign))
@@ -1382,7 +1382,7 @@ area(nse+1)=0.
 write(6,'(a)') ' In the following input data x,y,z are directed forward, port, up'
 read(20,'(a)') text1
 if (trim(adjustl(text1)).ne.trim(adjustl(text))) then
-    write(6,*) text1; write(6,*)text; stop'File 20 does not fit to the input data'
+    write(6,*) text1; write(6,*)text; stop 'File 20 does not fit to the input data'
 endif
 write(6,'(/1x,1a80)')text
 read(20,*)nfre
@@ -1581,7 +1581,7 @@ endif
 read(5,*) nforce                                                             !motion-dependent forces
 if (nforce>0) then
    read(5,*)((xforce(k,i),k=1,3),(aforce(k,i),k=1,3),(calforce(k,i),k=1,7),i=1,nforce)
-   if (nforce>10) stop'>> Max. 10 motion-dependent forces allowed'
+   if (nforce>10) stop '>> Max. 10 motion-dependent forces allowed'
    write(6,'('' Motion-depend. forces'',i5,9i11)')(i,i=1,nforce)
    write(6,'(1x,131(1h-))')
    write(6,'('' Force center     x '',10g11.3)') (xforce(1,i),i=1,nforce)
@@ -1691,7 +1691,7 @@ do ise = 1, nse                                                                 
    yofTemp(ise) = sum((/(yof(ise,1:nof(ise)))/)); zofTemp(ise) = sum((/(zof(ise,1:nof(ise)))/))                 ! GT/2006-05-03
 end do                                                                                                          ! GT/2006-05-03
 if (abs(npres+sum(wangl(1:nmu))+sum(x(1:nse))+sum(yofTemp)+sum(zofTemp)+g+rho+zwl+1/zbot-testnumber)>3e-2) then ! Soe110406
-   stop'>> File sectionresults does not fit to input data.'                                                     ! Soe110406
+   stop '>> File sectionresults does not fit to input data.'                                                     ! Soe110406
 end if
 deallocate(yofTemp); deallocate(zofTemp)                                                                        ! GT/2006-05-03
 imcorr(1:nmu)=(/(imu,imu=1,nmu)/)            !add encounter angles >90 degrees; maximum <270 degrees
@@ -2025,7 +2025,7 @@ Wavelengths: do iom=1,nom                                                       
             lineq7(1:6,1:6)=lineqmatr(:,1:6); lineq7(1:6,7:7)=loadcol; lineq7(1:6,8)=-ex(:,1,1)
             lineq7(7:7,1:7)=loadrow; lineq7(7,8)=0.
             call simqcd(lineq7,7,1,7,ks,1.e-6,cdetl)                                      !solve for motions
-            if (ks.ne.0) stop'>>Singular motion equations system'
+            if (ks.ne.0) stop '>>Singular motion equations system'
             motion=fillcomplmatr(6,1,lineq7(1:6,8))
             cym=lineq7(7,8)                                !transverse motion of suspended load rel. to ship
             cymabs=motion(6,1)*xl-motion(4,1)*(-zl+cablelength)+motion(2,1)+cym   !and in the inertial frame
@@ -2152,7 +2152,7 @@ Wavelengths: do iom=1,nom                                                       
            lineqmatr(:,7:7)=fwithoutu+ome**2*BNVtemp1                     !BNV/2006-05-08
            lineqmatr(1,:)=(/(-1.,0.),(0.,0.),(0.,0.),(0.,0.),(0.,0.),(0.,0.),motion(1,1)/)
            call simqcd(lineqmatr,6,1,6,ks,1.e-6,cdetl)   !solve for modified motions
-           if (ks.ne.0) stop'>> Singular system of equations for modified motion'
+           if (ks.ne.0) stop '>> Singular system of equations for modified motion'
            motionmod=lineqmatr(:,7:7)
            Sectns: do ise=1,nse
               write(6,'(a,a)') ' Sect. point  coord(2)  coord(3)     Re(p)     Im(p)       |p|',&

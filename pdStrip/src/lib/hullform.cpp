@@ -212,7 +212,7 @@ bool hullform::readSectionDef(QString filename){
   section tempSection;
 
   inputFile=fopen(filename.toLatin1().data(),"r");
-  if (inputFile=='\0') return false;
+  if (inputFile==NULL) return false;
   // First line contains symmetry data. Ignore for now.
   fgets(line,4096,inputFile);
 
@@ -239,7 +239,7 @@ bool hullform::readGhsDef(QString filename){
   section tempSection;
 
   inputFile=fopen(filename.toLatin1().data(),"r");
-  if (inputFile=='\0') return false;
+  if (inputFile==NULL) return false;
   // First three lines contain various non-section data.
   for (i=0;i<4;i++){
     fgets(line,4096,inputFile);
