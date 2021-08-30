@@ -1,5 +1,6 @@
-#include "odObject.h"
-#include "odRange.h"
+#include "../odObject.h"
+#include "../odRange.h"
+#include "waveSpectrum.h"
 #include <vector>
 using namespace std;
 
@@ -9,21 +10,9 @@ using namespace std;
 class odWaves : public odObject
 {
   public:
-    odRange period;
-    double sigHeight;
-    double waveHeading;
-    int spectrumType;
-    int nFreqs;
-    
-    vector<double> frequency;
-    vector<double> spectrum;
-    vector<double> amplitude;
-    vector<double> phase;
-    vector<double> heading;
-
     odWaves();
     void createSeaState();
-    void createPMspectrum();
+
     double elevationInfluence(double x, double y);
     odPoint velocityInfluence(odPoint pos);
 #ifdef GRAPHICS
@@ -33,8 +22,11 @@ class odWaves : public odObject
     void readFromXML(QDomNode root);
     
   private:
-    odRange freq;
+    waveSpectrum *spectrum;
 
+    double waveHeading;
+    vector<double> amplitude;
+    vector<double> heading;
     double rampTime;
 };
 

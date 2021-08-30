@@ -1,15 +1,15 @@
 TEMPLATE	= app
 LANGUAGE	= C++
 
+include(../config.pri)
+
 QT += xml core
 
-CONFIG  += qt warn_on debug
+CONFIG  += debug
 
-QMAKE_CXXFLAGS += -Wno-deprecated
-
-DEFINES += TOLERANCE=1e-9 dDOUBLE VERSION=QString\\\(\\\"1.0-0\\\"\\\)
-
-HEADERS += odWaves.h \
+HEADERS += waves/odWaves.h \
+           waves/waveSpectrum.h \
+           waves/PMSpectrum.h \
            odCable.h \
            odCurrent.h \
            odObject.h \
@@ -37,7 +37,9 @@ HEADERS += odWaves.h \
            wageningenB.h
 
 SOURCES += main.cpp \
-           odWaves.cpp \
+           waves/odWaves.cpp \
+           waves/waveSpectrum.cpp \
+           waves/PMSpectrum.cpp \
            odCable.cpp \
            odCurrent.cpp \
            odObject.cpp \
@@ -48,6 +50,7 @@ SOURCES += main.cpp \
            odFoilSection.cpp \
            odFoilPanel.cpp \
            odPoint.cpp \
+           odRange.cpp \
            odMatrix.cpp \
            odMesh.cpp \
            odHull.cpp \
@@ -69,24 +72,4 @@ LIBS += -lode
 #LIBS += -lodVTKWidget -lvtkCommon -lvtkWidgets -lvtkRendering -lvtkFiltering -lQVTK -lode -lqt4gnuplot opennurbs/libopenNURBS.a
 
 DESTDIR = ../bin
-
-unix {
-  UI_DIR = .ui
-  MOC_DIR = .moc
-  OBJECTS_DIR = .obj
-  profile{
-    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
-    QMAKE_LFLAGS   += -fprofile-arcs
-  }
-}
-
-win32{
-# Only needed for development purposes
-# Probably handy to leave in though,
-# as we tend to dump a lot of output to the console.
-  CONFIG += console
-  UI_DIR = win32/ui
-  MOC_DIR = win32/moc
-  OBJECTS_DIR = win32/obj
-  TARGET = win32/VTKtest
-}
+TARGET = openDynamics

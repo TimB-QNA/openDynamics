@@ -199,25 +199,31 @@ void odBody::readDynamicsDataFromXML(QDomNode root){
 void odBody::preSolveSetup(){
   int i, j;
   char fname[80];
-  
+  printf("Setup components\n");
   for (i=0;i<component.size();i++) component[i]->preSolveSetup();
   
-  sprintf(fname,"Forces_%s.dat",name.toLatin1().data());
+  printf("Opening forces file\n");
+  sprintf(fname,"output/Forces_%s.dat",name.toLatin1().data());
   forcesFile=fopen(fname,"w");
   fprintf(forcesFile,"Net forces and moments (T, Fx, Fy, Fz, Mx, My, Mz)\n");
-  sprintf(fname,"Position_%s.dat",name.toLatin1().data());
-  positionFile=fopen(fname,"w");
-  fprintf(positionFile,"Speed Position and attitude (T, Sx, Sy, Sz, Px, Py, Pz, Roll, Pitch, Yaw)\n");
   
+  printf("Opening position file\n");
+  sprintf(fname,"output/Position_%s.dat",name.toLatin1().data());
+  positionFile=fopen(fname,"w");
+  fprintf(positionFile,"Speed Position and attitude (T, Velx, Vely, Velz, Posx, Posy, Posz, Roll, Pitch, Yaw)\n");
+  
+  printf("Applying transforms\n");
   // Apply transform so we have some VTK data to write...
   for (i=0;i<component.size();i++){
+    printf("Component %i\n", i);
     if (component[i]->mesh.polygon.size()!=0){
-      if (component[i]->mesh.active.size()==0) component[i]->mesh.active.resize(mesh[i].polygon.size());
+      if (component[i]->mesh.active.size()==0) component[i]->mesh.active.resize(component[i]->mesh.polygon.size());
       for (j=0;j<component[i]->mesh.polygon.size();j++){
         component[i]->mesh.active[j]=component[i]->mesh.polygon[j].transformed(&odeBody);
       }
     }
   }
+  printf("Writing VTK for t=0\n");
   writeVTK();
 }
 
@@ -246,11 +252,12 @@ void odBody::advanceSolver(){
   fprintf(positionFile,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", *simTime,
          SpeedResult[0], SpeedResult[1], SpeedResult[2], x.back(), y.back(), z.back(),
          roll.back(), pitch.back(), yaw.back());
+  fflush(positionFile);
   
   // Transform the polygon mesh...
   for (i=0;i<component.size();i++){
     if (component[i]->mesh.polygon.size()!=0){
-      if (component[i]->mesh.active.size()==0) component[i]->mesh.active.resize(mesh[i].polygon.size());
+      if (component[i]->mesh.active.size()==0) component[i]->mesh.active.resize(component[i]->mesh.polygon.size());
       for (j=0;j<component[i]->mesh.polygon.size();j++){
         component[i]->mesh.active[j]=component[i]->mesh.polygon[j].transformed(&odeBody);
       }
@@ -263,6 +270,7 @@ void odBody::advanceSolver(){
   force  = dBodyGetForce(odeBody);
   torque = dBodyGetTorque(odeBody);
   fprintf(forcesFile,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n", *simTime, force[0],   force[1],  force[2], torque[0], torque[1], torque[2]);
+  fflush(forcesFile);
   
 //  printf("Forces (%lf) x, y, z : %lf\t%lf\t%lf\n", *simTime, force[0],   force[1],  force[2]);
   // Fix the body in specified axes...
@@ -307,7 +315,7 @@ void odBody::writeVTK(){
   char fname[80];
    
   for (i=0;i<component.size();i++){
-    sprintf(fname,"%s_ts%i.%s",component[i]->name.toLatin1().data(), tIndex, component[i]->vtksuffix.toLatin1().data());
+    sprintf(fname,"output/VTK/%s_ts%i.%s",component[i]->name.toLatin1().data(), tIndex, component[i]->vtksuffix.toLatin1().data());
     vtkFile=fopen(fname, "w");
     component[i]->exportVTK(vtkFile);
     fclose(vtkFile);

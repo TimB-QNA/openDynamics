@@ -166,14 +166,18 @@ void odMass::report(){
   int i;
   printf("Mass Report:\n");
   printf("  Components = %i\n",massElement.size());
+  printf("  Component ID\t\tName\tMass (kg)\tCentroid (x,y,z)\n");
   for (i=0;i<(int)massElement.size();i++){
-    printf("  Component %i - %s\n", i, massElement[i].meshRef.toLatin1().data());
-    printf("        Mass = %lf Kg\n", massElement[i].mass);
-    printf("    Centroid = %lf\t%lf\t%lf\t(x, y, z)\n", massElement[i].x, massElement[i].y, massElement[i].z);
+    printf("  Component %i - %12s\t", i, massElement[i].meshRef.toLatin1().data());
+    printf("%8.3lf\t", massElement[i].mass);
+    printf("%5.2lf\t%5.2lf\t%5.2lf\n", massElement[i].x, massElement[i].y, massElement[i].z);
+    
+//    printf("        Mass = %7.3lf Kg\n", massElement[i].mass);
+//    printf("    Centroid = %5.2lf\t%5.2lf\t%5.2lf\t(x, y, z)\n", massElement[i].x, massElement[i].y, massElement[i].z);
   }
   printf("  Totals:\n");
-  printf("    Mass     = %lf Kg\n", mass);
-  printf("    Centroid = %lf\t%lf\t%lf\t(x, y, z)\n", centroid.x, centroid.y, centroid.z);
-  printf("    Gyradius = %lf\t%lf\t%lf\t(Kxx, Kyy, Kzz)\n", sqrt(Ixx/mass), sqrt(Iyy/mass), sqrt(Izz/mass));
-  printf("    Inertias = %lf\t%lf\t%lf\t(Ixy, Ixz, Iyz)\n", Ixy, Ixz, Iyz);
+  printf("    Mass     = %0.3lf Kg\n", mass);
+  printf("    Centroid = %10.2lf\t%10.2lf\t%10.2lf\t(x, y, z)\n", centroid.x, centroid.y, centroid.z);
+  printf("    Gyradius = %10.2lf\t%10.2lf\t%10.2lf\t(Kxx, Kyy, Kzz)\n", sqrt(Ixx/mass), sqrt(Iyy/mass), sqrt(Izz/mass));
+  printf("    Inertias = %10.2lf\t%10.2lf\t%10.2lf\t(Ixy, Ixz, Iyz)\n", Ixy, Ixz, Iyz);
 }

@@ -1,3 +1,4 @@
 TEMPLATE = subdirs
 SUBDIRS  = pdStrip \
-           src
+           src \
+           src/unitTests

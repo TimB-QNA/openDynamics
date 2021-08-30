@@ -1,0 +1,43 @@
+#!/usr/bin/gnuplot
+
+set terminal postscript landscape colour font "FreeMono, 9"
+set output "Example.ps"
+
+set grid
+
+set xlabel "Time (sec)"
+
+set ylabel "Force (N)"
+set multiplot layout 3,1 title "Force Data"
+  plot "output/Forces_Vessel.dat" using 1:2 with lines title "X"
+  plot "output/Forces_Vessel.dat" using 1:3 with lines title "Y"
+  plot "output/Forces_Vessel.dat" using 1:4 with lines title "Z"
+unset multiplot
+
+set ylabel "Moment (Nm)"
+set multiplot layout 3,1 title "Moment Data"
+  plot "output/Forces_Vessel.dat" using 1:5 with lines title "X"
+  plot "output/Forces_Vessel.dat" using 1:6 with lines title "Y"
+  plot "output/Forces_Vessel.dat" using 1:7 with lines title "Z"
+unset multiplot
+
+set ylabel "Speed (m/s)"
+set multiplot layout 3,1 title "Speed Data"
+  plot "output/Position_Vessel.dat" using 1:2 with lines title "X"
+  plot "output/Position_Vessel.dat" using 1:3 with lines title "Y"
+  plot "output/Position_Vessel.dat" using 1:4 with lines title "Z"
+unset multiplot
+
+set ylabel "Position (m)"
+set multiplot layout 3,1 title "Position Data"
+  plot "output/Position_Vessel.dat" using 1:5 with lines title "X"
+  plot "output/Position_Vessel.dat" using 1:6 with lines title "Y"
+  plot "output/Position_Vessel.dat" using 1:7 with lines title "Z"
+unset multiplot
+
+set ylabel "Attitude (deg)"
+set multiplot layout 3,1 title "Attitude Data"
+  plot "output/Position_Vessel.dat" using 1:8 with lines title "Roll (X)"
+  plot "output/Position_Vessel.dat" using 1:9 with lines title "Pitch (Y)"
+  plot "output/Position_Vessel.dat" using 1:10 with lines title "Yaw (Z)"
+unset multiplot

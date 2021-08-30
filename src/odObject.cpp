@@ -12,9 +12,9 @@ odObject::odObject(){
 }
 
 void odObject::openDataStream(QString objectType){
-  QString fileName=objectType+QString("_%1.txt").arg(uid);
+  QString fileName=QString("output/")+objectType+QString("_%1.txt").arg(uid);
   dataStream=fopen(fileName.toLatin1().data(),"w");
-  if (dataStream=='\0'){
+  if (dataStream==nullptr){
     dataStream=stderr;
     fprintf(dataStream,"Could not open - %s\n",fileName.toLatin1().data());
     return;
@@ -174,7 +174,7 @@ void odObject::volumetricSolver(){
       mesh.active[i].pressure=(zeta-mesh.active[i].centroid().z)*density(mesh.active[i].centroid())*constants->g;
       fz=mesh.active[i].projectedAreaXY()*mesh.active[i].pressure;
       // Check whether there is a column of fluid above this cell, if so, consider it a downward force. 
-      if (mesh.active[1].normal().z<0) fz=-fz;
+//      if (mesh.active[1].normal().z<0) fz=-fz;
       M.x += fz*mesh.active[i].centroid().x;
       M.y += fz*mesh.active[i].centroid().y;
       M.z += fz*mesh.active[i].centroid().z;

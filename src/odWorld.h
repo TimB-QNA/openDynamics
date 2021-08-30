@@ -4,7 +4,7 @@
 #include <ode/ode.h>
 #include "odConstants.h"
 #include "odBody.h"
-#include "odWaves.h"
+#include "waves/odWaves.h"
 #include "odSpring.h"
 #include "odCable.h"
 #include "odCurrent.h"

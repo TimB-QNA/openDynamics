@@ -1,4 +1,6 @@
 #include "odWaves.h"
+#include "PMSpectrum.h"
+
 #ifdef GRAPHICS
   #include <vtkStructuredGrid.h>
   #include <vtkProperty.h>
@@ -7,12 +9,8 @@
 
 odWaves::odWaves(){
   waveHeading=0.;
-  period.min=5.;
-  period.max=10.;
-  sigHeight=0;
-  spectrumType=0;
-  nFreqs=20;
   name="Waves";
+  spectrum=nullptr;
 }
 
 void odWaves::readFromXML(QDomNode root){
@@ -21,13 +19,9 @@ void odWaves::readFromXML(QDomNode root){
   node=root.firstChild();
   while (!node.isNull()){
     element=node.toElement();
-    if (element.tagName().toLower()=="height") sigHeight=element.text().toDouble();
-    if (element.tagName().toLower()=="type") spectrumType=element.text().toInt();
-    if (element.tagName().toLower()=="period"){
-      if (element.hasAttribute("min")) period.min=element.attribute("min").toDouble();
-      if (element.hasAttribute("max")) period.max=element.attribute("max").toDouble();
+    if (element.tagName().toLower()=="type"){
+      if (element.text().toLower()=="pm") spectrum = new PMSpectrum(constants, root.firstChild());
     }
-    if (element.tagName().toLower()=="frequencies") nFreqs=element.text().toInt();
     if (element.tagName().toLower()=="heading")     waveHeading=element.text().toDouble()+90; // Add 90 to make wave heading 0 move toward +X
     if (element.tagName().toLower()=="ramptime")    rampTime=element.text().toDouble();
     node=node.nextSibling();
@@ -35,77 +29,70 @@ void odWaves::readFromXML(QDomNode root){
 }
 
 void odWaves::createSeaState(){
-  int i;
+  unsigned int i;
   double dOmega;
   
-  frequency.clear();
-  spectrum.clear();
   amplitude.clear();
   heading.clear();
-  phase.clear();
-  
-  if (spectrumType==0){
-    // No waves, do nothing
-    return;
-  }
-  if (spectrumType==1){
-    //Pierson-Moscowitch spectrum...
-    createPMspectrum();
-  }
-  
-  dOmega=freq.range/(double)frequency.size();
-  for (i=0;i<(int)frequency.size();i++){
-    amplitude.push_back(sqrt(2.*spectrum[i]*dOmega));
-    phase.push_back((double)rand()/(double)RAND_MAX*2.*constants->pi);
-    heading.push_back(constants->pi/180. * waveHeading);
-  }
-}
 
-void odWaves::createPMspectrum(){
-  int i;
+  if (spectrum==nullptr) return;
   
-  freq.min  =(2.*constants->pi)/period.max;
-  freq.max  =(2.*constants->pi)/period.min;
-  freq.range=freq.max-freq.min;
-  for (i=0;i<nFreqs;i++){
-    frequency.push_back(freq.min + (double)i/(double)(nFreqs-1)*freq.range);
-    spectrum.push_back((0.0081*pow(constants->g,2))/pow(frequency.back(),5) * exp((-3.11/pow(sigHeight,2))/pow(frequency.back(),4)));
+  spectrum->createSpectrum();
+  
+  dOmega=spectrum->freq.range()/(double)spectrum->spectrum.size();
+  
+//  printf("FreqMin = %lf\n", spectrum->freq.min);
+//  printf("FreqMax = %lf\n", spectrum->freq.max);
+//  printf("FreqRange = %lf\n", spectrum->freq.range());
+//  printf("Spectrum size = %lf\n", (double)spectrum->spectrum.size());
+//  printf("dOmega = %lf\n", dOmega);
+  
+  for (i=0;i<spectrum->spectrum.size();i++){
+    amplitude.push_back(2.*spectrum->spectrum[i].magnitude*dOmega);
+    heading.push_back(constants->pi/180. * waveHeading);
+    
+//    printf("F / M / A = %lf      %lf     %lf\n", spectrum->spectrum[i].frequency, spectrum->spectrum[i].magnitude,  amplitude[i]);
   }
 }
 
 double odWaves::elevationInfluence(double x, double y){
-  int i;
+  unsigned int i;
   double zeta, lambda, k, period;
-  if (spectrumType==0) return 0;
+  if (spectrum==nullptr) return 0;
   
   zeta=0;
-  for (i=0;i<(int)frequency.size();i++){
-    period=frequency[i]/(2.*constants->pi);
+  for (i=0;i<spectrum->spectrum.size();i++){
+    period=spectrum->spectrum[i].frequency/(2.*constants->pi);
     lambda=constants->g/(2.*constants->pi*pow(period,2));
     k=(2.*constants->pi)/lambda;
-    zeta+=amplitude[i]*sin(frequency[i]*(*simTime)-k*sin(heading[i])*x-k*cos(heading[i])*y+phase[i]);
+    zeta+=amplitude[i] * sin(spectrum->spectrum[i].frequency*(*simTime)-k*sin(heading[i])*x-k*cos(heading[i])*y+spectrum->spectrum[i].phase);
   }
   if (*simTime<rampTime) zeta*= *simTime/rampTime;
+  zeta*=50;
+  
   return zeta;
 }
 
 odPoint odWaves::velocityInfluence(odPoint pos){
-  int i;
-  double zeta_i, zeta, z, lambda, k, period;
+  unsigned int i;
+  double zeta_i, zeta, z, lambda, k, period, freq, phase;
   odPoint wV;
-  if (spectrumType==0) return wV;
+  if (spectrum==nullptr) return wV;
   
   zeta=odObject::elevation(pos.x, pos.y);
   if (pos.z>zeta) return wV;
   z=-pos.z;
-  for (i=0;i<(int)frequency.size();i++){
-    period=frequency[i]/(2.*constants->pi);
+  for (i=0;i<spectrum->spectrum.size();i++){
+    freq=spectrum->spectrum[i].frequency;
+    phase=spectrum->spectrum[i].phase;
+    
+    period=freq/(2.*constants->pi);
     lambda=constants->g/(2.*constants->pi*pow(period,2));
     k=(2.*constants->pi)/lambda;
-    zeta_i=amplitude[i]*sin(frequency[i]*(*simTime)-k*sin(heading[i])*pos.x-k*cos(heading[i])*pos.y+phase[i]);
-    wV.x+=frequency[i]/(2.*constants->pi)*zeta*exp(k*z)*sin(frequency[i]*(*simTime)-k*sin(heading[i])*pos.x+phase[i]);
-    wV.y+=frequency[i]/(2.*constants->pi)*zeta*exp(k*z)*sin(frequency[i]*(*simTime)-k*cos(heading[i])*pos.y+phase[i]);
-    wV.z+=frequency[i]/(2.*constants->pi)*zeta*exp(k*z)*cos(frequency[i]*(*simTime)-k*sin(heading[i])*pos.x-k*cos(heading[i])*pos.y+phase[i]);
+    zeta_i=amplitude[i]*sin(freq*(*simTime)-k*sin(heading[i])*pos.x-k*cos(heading[i])*pos.y+phase);
+    wV.x+=freq/(2.*constants->pi)*zeta*exp(k*z)*sin(freq*(*simTime)-k*sin(heading[i])*pos.x+phase);
+    wV.y+=freq/(2.*constants->pi)*zeta*exp(k*z)*sin(freq*(*simTime)-k*cos(heading[i])*pos.y+phase);
+    wV.z+=freq/(2.*constants->pi)*zeta*exp(k*z)*cos(freq*(*simTime)-k*sin(heading[i])*pos.x-k*cos(heading[i])*pos.y+phase);
   }
   if (*simTime<rampTime) wV*= *simTime/rampTime;
   return wV;

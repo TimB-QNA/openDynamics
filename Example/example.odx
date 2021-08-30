@@ -1,40 +1,42 @@
 <opendynamics>
   <world> 
     <simulation>
-      <timestep>0.01</timestep>
-      <endTime>600</endTime>
+      <timestep>0.05</timestep>
+      <endTime>60</endTime>
     </simulation>
-    <seastate>    
-      <height>0</height>
-      <type>1</type>
-      <period min="5" max="20"/>
+    <seastate>
+      <type>pm</type>
+      <height>0.15</height>
+      <period min="1" max="20"/>
       <frequencies>30</frequencies>
       <heading>45</heading>
-      <rampTime>15</rampTime>
+      <rampTime>0</rampTime>
     </seastate>
     
     <vessel>
+      <name>Vessel</name>
       <dynamics>
         <position x="0" y="0" z="0.00675"/>
         <velocity x="0" y="0" z="0"/>
         <attitude x="0" y="-0.325" z="0"/>
         <damping angular="0.01" linear="0.01"/>
       </dynamics>
-      <mesh reference="Hull">
+      <mesh reference="HullMsh">
         <filename>35_HullAndDeck.stl</filename>
       </mesh>
-      <mesh reference="Bulb">
+      <mesh reference="BulbMsh">
         <filename>35_Bulb.stl</filename>
       </mesh>
-      <mesh reference="Fin">
+      <mesh reference="FinMsh">
         <filename>35_Fin.stl</filename>
       </mesh>
-      <mesh reference="Rudder">
+      <mesh reference="RudderMsh">
         <filename>35_Rudder.stl</filename>
       </mesh>
 
       <hull>
-        <mesh>Hull</mesh>
+        <name>Hull</name>
+        <mesh>HullMsh</mesh>
         <resistance type="delft">
           <model>0</model>
           <waterline>10.0</waterline>
@@ -42,8 +44,9 @@
       </hull>
       
       <foil>
+        <name>rudder</name>
         <type>rudder</type>
-        <mesh>Rudder</mesh>
+        <mesh>RudderMsh</mesh>
         <stock>
           <origin x="-4.500" y="0" z="-0.123"/>
           <end x="-4.449" y="0" z="0.191"/>
@@ -60,10 +63,10 @@
       </foil>
 
       <mass>
-        <mesh mass="5200">Hull</mesh>
-        <mesh density="2000" thickness="0.06">Fin</mesh>
-        <mesh mass="500">Bulb</mesh>
-        <mesh density="800" thickness="0.06">Rudder</mesh>
+        <mesh mass="5200">HullMsh</mesh>
+        <mesh density="2000" thickness="0.06">FinMsh</mesh>
+        <mesh mass="500">BulbMsh</mesh>
+        <mesh density="800" thickness="0.06">RudderMsh</mesh>
       </mass>
 
     </vessel>

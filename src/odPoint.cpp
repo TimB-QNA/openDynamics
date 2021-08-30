@@ -124,7 +124,6 @@ void odPoint::display(){
 }
 
 odPoint odPoint::rotate(odPoint angles){
-  double pi=4.*atan(1.);
   double alpha=angles.x;
   double beta=-angles.y;
   double gamma=angles.z;

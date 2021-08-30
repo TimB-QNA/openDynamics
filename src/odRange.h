@@ -6,7 +6,7 @@ class odRange
   public:
     double min;
     double max;
-    double range;
+    double range();
 };
 
 #endif

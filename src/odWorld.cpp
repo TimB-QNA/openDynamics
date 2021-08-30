@@ -11,6 +11,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2){
   dBodyID b1,b2;
   dContact contact;
   dVector3 P;
+  printf("Checking for collisions\n");
   odWorld *ref=reinterpret_cast<odWorld*>(data);
     
   b1 = dGeomGetBody(o1);
@@ -22,9 +23,9 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2){
   contact.surface.mu2 = 0;
   
   dBodyGetRelPointPos(b1, 0, 0, 0, P);
-//  printf("Body 1 Pos %lf\t%lf\t%lf\n", P[0], P[1], P[2]);  
+  printf("Body 1 Pos %lf\t%lf\t%lf\n", P[0], P[1], P[2]);  
   dBodyGetRelPointPos(b2, 0, 0, 0, P);
-//  printf("Body 2 Pos %lf\t%lf\t%lf\n", P[0], P[1], P[2]);
+  printf("Body 2 Pos %lf\t%lf\t%lf\n", P[0], P[1], P[2]);
 
 //  nContacts=dCollide (o1, o2, 1, &contact.geom, sizeof(dContactGeom));
 //  printf("Found %i contacts\n", nContacts);
@@ -40,6 +41,10 @@ odWorld::odWorld(){
   tIndex=0;
   simTime=0.;
   timeStep=0.05;
+  
+  dInitODE();
+  
+  seastate.constants=&constants;
 }
 
 double odWorld::currentTime(){
@@ -53,7 +58,6 @@ void odWorld::setupReferences(){
   // Count the number of components, and provide each with a uid.
   // At the same time, set some useful pointers. 
   comp=2; // Waves and current will take some space...
-  seastate.constants=&constants;
   seastate.timeStep=&timeStep;
   seastate.simTime=&simTime;
   
@@ -172,7 +176,7 @@ void odWorld::initialiseSolver(){
   double l,b,d, vol;
   dMatrix3 R;
   FILE *vtkFile;
-  char fname[80];
+  char fname[256];
   
   world = dWorldCreate();
   dWorldSetERP(world, 1);
@@ -194,34 +198,45 @@ void odWorld::initialiseSolver(){
     vessel[i].setupBody(&world);
   }
   
+  printf("Setting up references\n");
   setupReferences();
+  
+  printf("Creating sea state\n");
   seastate.createSeaState();
+  
+  printf("Setting up springs\n");
   for (i=0; i<(int)springs.size(); i++){
     springs[i].attachBodies(&vessel);
 //    springs[i].preSolveSetup();
   }
+  
+  printf("Setting up cables\n");
   for (i=0; i<(int)cables.size(); i++){
     cables[i].findBodies(&vessel);
     cables[i].setupBody(&world, space);
     cables[i].preSolveSetup();
-  }  
+  }
+  
+  printf("Setting up vessels\n");
   for (i=0; i<(int)vessel.size(); i++){
+    printf("Vessel %i\n",i);
     vessel[i].preSolveSetup();
   }
   simTime=0;
   
-  sprintf(fname,"waves_ts%i.vtu", 0);
+  sprintf(fname,"output/VTK/waves_ts%i.vtu", 0);
   vtkFile=fopen(fname, "w");
   seastate.exportVTK(vtkFile);
   fclose(vtkFile);
     
   for (i=0;i<cables.size();i++){
-    sprintf(fname,"cable_%i_ts%i.vtp", i, 0);
+    sprintf(fname,"output/VTK/cable_%i_ts%i.vtp", i, 0);
     vtkFile=fopen(fname, "w");
     cables[i].exportVTK(vtkFile);
     fclose(vtkFile);
   }
   
+  printf("post-advancing vessels\n");
   for (i=0; i<(int)vessel.size(); i++){
     vessel[i].postAdvance();
   }
@@ -235,21 +250,21 @@ void odWorld::run(){
   double secs;
   
   FILE *vtkFile;
-  char fname[80];
+  char fname[256];
   
   start=clock();
   for (i=0;simTime<=endTime;i++){
     constants.simTime=simTime;
     printf("Simulation time=%lf\n",simTime);
     advanceSolver();
-  
-    sprintf(fname,"waves_ts%i.vtu", tIndex);
+ 
+    sprintf(fname,"output/VTK/waves_ts%i.vtu", tIndex);
     vtkFile=fopen(fname, "w");
     seastate.exportVTK(vtkFile);
     fclose(vtkFile);
     
     for (i=0;i<cables.size();i++){
-      sprintf(fname,"cable_%i_ts%i.vtp", i, tIndex);
+      sprintf(fname,"output/VTK/cable_%i_ts%i.vtp", i, tIndex);
       vtkFile=fopen(fname, "w");
       cables[i].exportVTK(vtkFile);
       fclose(vtkFile);
@@ -259,7 +274,7 @@ void odWorld::run(){
     for (i=0; i<(int)vessel.size(); i++){
       vessel[i].postAdvance();
     }
-    
+
   }
   end=clock();
   diff=end-start;
@@ -269,18 +284,20 @@ void odWorld::run(){
 
 void odWorld::advanceSolver(){
   int i;
+
   for (i=0; i<vessel.size(); i++){
     vessel[i].advanceSolver();
   }
-  for (i=0; i<cables.size(); i++){
-    cables[i].advanceSolver();
-  }
+//
+//  for (i=0; i<cables.size(); i++){
+//    cables[i].advanceSolver();
+//  }
   
-  dSpaceCollide (space, this ,&nearCallback);
-//  dWorldQuickStep(world, timeStep);
-  dWorldStep(world, timeStep);
+//  dSpaceCollide (space, this ,&nearCallback);
+  dWorldQuickStep(world, timeStep);
+//  dWorldStep(world, timeStep);
   /* remove all contact joints */
-  dJointGroupEmpty (contactgroup);
+//  dJointGroupEmpty (contactgroup);
     
   simTime+=timeStep;
   tIndex++;
