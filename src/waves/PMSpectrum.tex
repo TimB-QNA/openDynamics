@@ -1,0 +1,40 @@
+\section{Pierson-Moscowitz Wave Spectrum}
+
+Several different versions of the Pierson-Moscowitz spectrum exist. In this code we only consider the simplest spectrum, which has only a single parameter. More detailed spectra can be added later, but for initial test work this provides a reasonable deep-water seastate.
+ 
+\subsection{Spectrum calculation}
+
+The spectrum is taken from \cite{unknown-unknown-GuidanceandControl}, wherein it is given in the general form as
+
+\begin{equation}
+S(\omega)=A \omega^{-5} \exp(-B \omega^{-4})
+\label{eq:PM-general}
+\end{equation}
+
+\noindent
+With the single-parameter equations for A and B given as
+
+\begin{equation}
+A=8.1*10^{-3} g^2
+\label{eq:PM-singleParamA}
+\end{equation}
+
+\begin{equation}
+B=0.0323 \left( g \over H_{1/3} \right)^2
+\label{eq:PM-singleParamB}
+\end{equation}
+
+\noindent
+Additionally, we define phase angles for each wave component in software. These angles are generated randomly in the range $0$ to $2*\pi$. At present there is no capability for the user to seed these values.
+
+\subsection{Spectrum validation}
+
+The spectrum has been validated for a waveheight of 5 meters against the data given in \cite{unknown-unknown-GuidanceandControl}. The source data was reverse-engineered from the given graph (pg 63, fig 3.3), and thus may have some associated inaccuracy, however, this is minimal. The two data sets are compared and shown to be accurate in figure \ref{fig:pmmag}.
+
+\begin{figure}[h]
+  \centering
+  \includesvg[width=0.6\columnwidth]{\unitTests/waves/images/PM_mag.svg}
+%  \input{\unitTests/waves/images/PM_mag.tex}
+  \caption{Pierson Moscowitz Spectrum}
+  \label{fig:pmmag}
+\end{figure}

@@ -1,7 +1,7 @@
-\documentclass[11pt,twoside,a4paper]{report}
-
-%Include bibliography in table of contents
-\usepackage[nottoc,numbib]{tocbibind}
+% File Paths
+\newcommand{\template}{../template}
+\newcommand{\src}{../../src}
+\newcommand{\unitTests}{../../src/unitTests}
 
 % Custom commands
 \newcommand{\userTitle}{openDynamics Validation Cases}
@@ -10,74 +10,12 @@
 \newcommand{\userSubject}{openDynamics Validation}
 \newcommand{\userKeywords}{validation}
 
-\newcommand{\clearemptydoublepage}{
-  \newpage{\pagestyle{empty}\cleardoublepage}
-}
+\input{\template/docSetup.tex}
 
-% Improve page geometry
-\usepackage{geometry}
-\geometry{
-  a4paper,
-  top=2cm,
-  bottom=2.5cm,
-  left=2.5cm,
-  right=2.5cm
-}
-%\usepackage{showframe}
-
-% Improve page style
-\usepackage{fancyhdr}
-\renewcommand{\headrulewidth}{0pt}
-\fancypagestyle{StandardPageStyle}{
-  \fancyhf{}
-  \fancyhead[RE,LO]{\leftmark}
-  \fancyfoot[RE,LO]{\userTitle}
-  \fancyfoot[LE,RO]{\thepage}
-}
-
-
-%Sort out chapter head page styles
-\fancypagestyle{plain}{
-  \fancyhf{}
-  \fancyfoot[RE,LO]{\userTitle}
-  \fancyfoot[LE,RO]{\thepage}
-}
-
-%Sort out chapter blank page styles
-\fancypagestyle{empty}{
-  \fancyhf{}
-  \fancyfoot[RE,LO]{\userTitle}
-  \fancyfoot[LE,RO]{\thepage}
-}
-
-\pagestyle{StandardPageStyle}
-
-% PDF and hyperlink setup (required, but should be loaded last)
-\usepackage[pdftex,
-            pdfauthor=\userAuthor,
-            pdftitle=\userTitle,
-            pdfsubject=\userSubject,
-            pdfkeywords=\userKeywords,
-            pagebackref=true,
-            colorlinks=true,
-            linkcolor=black,
-            citecolor=black,
-            unicode]{hyperref}
-%Setup title/author etc...
-\title{\userTitle}
-\author{\userAuthor}
-
-\begin{document}
-\hypersetup{pageanchor=false,
-             bookmarksnumbered=true,
-             pdfencoding=unicode
-            }
-\input{../template/cover.tex}
-\clearemptydoublepage
-\tableofcontents
-\clearemptydoublepage
 \input{Introduction.tex}
 \clearemptydoublepage
+\input{\unitTests/waves/waves.tex}
+
 \bibliographystyle{plain}
 \bibliography{../library.bib}
 \end{document}

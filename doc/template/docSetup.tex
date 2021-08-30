@@ -2,13 +2,15 @@
 
 %Include bibliography in table of contents
 \usepackage[nottoc,numbib]{tocbibind}
+\usepackage{graphicx}
+\usepackage{svg}
 
 % Custom commands
-\newcommand{\userTitle}{XX-DOCUMENT-TITLE-XX}
-\newcommand{\userAuthor}{XX-AUTHOR-XX}
-\newcommand{\userDate}{\today}
-\newcommand{\userSubject}{XX-SUBJECT-XX}
-\newcommand{\userKeywords}{XX-KEYWORDS-XX}
+%\newcommand{\userTitle}{XX-DOCUMENT-TITLE-XX}
+%\newcommand{\userAuthor}{XX-AUTHOR-XX}
+%\newcommand{\userDate}{\today}
+%\newcommand{\userSubject}{XX-SUBJECT-XX}
+%\newcommand{\userKeywords}{XX-KEYWORDS-XX}
 
 \newcommand{\clearemptydoublepage}{
   \newpage{\pagestyle{empty}\cleardoublepage}
@@ -72,12 +74,13 @@
              bookmarksnumbered=true,
              pdfencoding=unicode
             }
-\input{cover.tex}
+\input{\template/cover.tex}
 \clearemptydoublepage
 \tableofcontents
 \clearemptydoublepage
-\input{chapter.tex}
-\clearemptydoublepage
-\bibliographystyle{plain}
-\bibliography{library.bib}
-\end{document}
+
+%\input{chapter.tex}
+%\clearemptydoublepage
+%\bibliographystyle{plain}
+%\bibliography{library.bib}
+%\end{document}
